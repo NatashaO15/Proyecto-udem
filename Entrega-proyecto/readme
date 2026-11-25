@@ -1,0 +1,29 @@
+Pronóstico de demanda de picking · CEDI
+
+Proyecto de ciencia de datos que pronostica las líneas de picking por día y canal de un centro de distribución (CEDI) en Colombia, para que la operación pueda planear su personal con una semana de anticipación.
+
+Equipo: Natasha Orozco · Xiomy Baquero · Andrés Zabala
+
+El problema
+
+El CEDI atiende dos canales con dinámicas distintas: Picking Packing (PP), con ritmo semanal marcado, y TAT (tiendas), que depende del nivel de cobertura de rutas y de los eventos del calendario. Entre 2023 y 2026 hubo decisiones internas (cambios de catálogo, recorte de rutas TAT y la jornada de 42 horas desde el 15-jul-2026) que cambiaron el nivel y la forma de la demanda. Un pronóstico que ignore esos cambios sobreestima la carga actual.
+
+Qué hay en el repositorio
+Notebook 01 · EDA de series de tiempo: limpieza de la base WMS, calendario operativo (1,132 días), descomposición STL, pruebas de estacionariedad, autocorrelación y análisis de capacidad.
+Notebook 02 · Feature engineering: variables de calendario, rezagos e historia reciente, auditoría de data leakage y exportación de la tabla final.
+Notebook 03 · Modelado: backtesting con 29 cortes semanales, comparación de seis métodos, selección del modelo y pronóstico de la semana del 23 al 27 de noviembre de 2026.
+Bitácora y resumen ejecutivo: documentación del proceso y de las decisiones, en versión técnica y gerencial.
+Presentación: versión para sustentación en 20 minutos.
+Hallazgos principales
+En semanas normales, el promedio de las últimas 4 semanas es tan preciso como cualquier modelo probado: ningún método más complejo le gana con una diferencia que no pueda ser azar.
+En semanas con eventos (cierre de año, Semana Santa), el promedio falla porque no anticipa el evento. Gradient Boosting, que usa variables de calendario, reduce ese error.
+El pronóstico semanal es más confiable que el diario, así que la planeación de plantilla conviene hacerla por semana.
+Las variables del mismo día (pedidos, SKUs, puntos de envío) mejoran el error de forma aparente, pero no se pueden usar: al viernes nadie las conoce. Se excluyeron y se documentó el efecto.
+Cómo reproducirlo
+Colocar dataset_version3.csv y features_modelo.csv en la carpeta de datos. El CSV usa ; como separador, , decimal y codificación utf-8-sig.
+Ejecutar los notebooks en orden: 01, 02 y 03. Cada notebook documenta sus supuestos y decisiones en las celdas de texto.
+Los paquetes necesarios son pandas, numpy, scikit-learn, statsmodels, prophet, plotly y holidays.
+Limitaciones
+El régimen operativo actual (jornada de 42 horas) tiene solo 19 semanas de historia. Por eso las diferencias entre modelos no son concluyentes en semanas normales.
+La ventaja de Gradient Boosting en eventos se midió en un periodo que también se usó para ajustar los modelos. Debe validarse con el cierre de año 2026.
+El dataset cubre dos canales (MP queda fuera por ser el 0.6% del volumen). Los datos van de enero de 2023 al 20 de noviembre de 2026.
